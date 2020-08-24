@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "582915130340",
+    "firebase_url": "https://hefesto-g.firebaseio.com",
+    "project_id": "hefesto-g",
+    "storage_bucket": "hefesto-g.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:582915130340:android:b684f9652038aa263e7df1",
+        "android_client_info": {
+          "package_name": "com.example.PetFinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "582915130340-n46db6ts1afq2il0qsoursp1ba78rv6l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0h53oEg4pIola_50iL5XFXxX02XBHYKw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "582915130340-n46db6ts1afq2il0qsoursp1ba78rv6l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

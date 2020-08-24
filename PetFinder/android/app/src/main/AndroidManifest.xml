@@ -9,10 +9,12 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="PetFinder"
         android:icon="@mipmap/ic_launcher">
+       
         <meta-data
               android:name="com.google.android.geo.API_KEY"
               android:value="AIzaSyAxuciBbNd-jYX8XaoiNaI4RWpOa2Xo9Ns"
               />
+       
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
