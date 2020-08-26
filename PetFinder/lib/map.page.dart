@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class MapPage extends StatefulWidget {
   @override
@@ -8,8 +9,16 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  DatabaseReference dataRef;
   GoogleMapController mapController;
   Set<Marker> markers = new Set<Marker>();
+  var latRef;
+  var lngRef;
+  var dogNameRef;
+  var lastTimeRef;
+  var lastDateRef;
+  var dateTimeRef;
+  var dogIdRef;
   double lat = -3.09197916667;
   double lng = -60.0164885;
 
@@ -18,24 +27,42 @@ class _MapPageState extends State<MapPage> {
   }
 
   @override
+  void initState() {
+    dataRef = FirebaseDatabase.instance.reference().child("ShurasteiHash");
+    super.initState();
+  }
+
+  void readData() {
+    dataRef.once().then((DataSnapshot snapshot) {
+      latRef = snapshot.value["latitude"];
+      lngRef = snapshot.value["longitude"];
+      dogNameRef = snapshot.value["dog_name"];
+      lastTimeRef = snapshot.value["time"].toString();
+      lastDateRef = snapshot.value["date"].toString();
+      dateTimeRef = lastDateRef + "\n" + lastTimeRef;
+      dogIdRef = snapshot.value["dog_id"].toString();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: TextField(
           onSubmitted: (val) {
-            lat = -3.09197916667; //Inserir lat FIREBASE
-            lng = -60.0164885; //Inserir lng FIREBASE
-
-            LatLng position = LatLng(lat, lng);
+            readData();
+            print(latRef);
+            print(lngRef);
+            LatLng position = LatLng(latRef, lngRef);
             mapController.moveCamera(CameraUpdate.newLatLng(position));
 
             final Marker marker = Marker(
-              markerId:
-                  new MarkerId("1"), //criar ID único com localização dinâmica
+              markerId: new MarkerId(
+                  dogIdRef), //criar ID único com localização dinâmica
               position: position,
               infoWindow: InfoWindow(
-                title: "Cachorro 1", //Passar nome de cachorro do FIREBASE
-                snippet: "Hub do Hefesto",
+                title: dogNameRef, //Passar nome de cachorro do FIREBASE
+                snippet: dateTimeRef,
               ),
             );
             setState(() {
