@@ -41,7 +41,6 @@ class _MapPageState extends State<MapPage> {
   var lastDateRef;
   var dateTimeRef;
   var dogIdRef;
-  final snackBar = SnackBar(content: Text('Dog nao encontrado'));
   double lat = 46.233832398;
   double lng = 6.053166454;
 
@@ -62,7 +61,7 @@ class _MapPageState extends State<MapPage> {
       dogNameRef = snapshot.value["dog_name"];
       lastTimeRef = snapshot.value["time"].toString();
       lastDateRef = snapshot.value["date"].toString();
-      dateTimeRef = lastDateRef + "\n" + lastTimeRef;
+      dateTimeRef = "Data: " + lastDateRef + "\n" + "Hora: " + lastTimeRef;
       dogIdRef = snapshot.value["dog_id"].toString();
     });
   }
@@ -72,33 +71,34 @@ class _MapPageState extends State<MapPage> {
     readData();
     return Scaffold(
         appBar: AppBar(
-          title: TextField(onSubmitted: (val) {
-            if (val == dogNameRef) {
-              print(latRef);
-              print(lngRef);
-              LatLng position = LatLng(latRef, lngRef);
-              mapController.moveCamera(CameraUpdate.newCameraPosition(
-                  CameraPosition(target: position, zoom: 19.00)));
-
-              final Marker marker = Marker(
-                  markerId: new MarkerId(
-                      dogIdRef), //criar ID único com localização dinâmica
-                  position: position,
-                  onTap: () {
-                    _showDialog(dogNameRef, dateTimeRef);
+          title: TextField(
+              decoration: new InputDecoration.collapsed(
+                  hintText: 'Insira o nome do seu dog aqui!!!'),
+              onSubmitted: (val) {
+                if (val == dogNameRef) {
+                  print(latRef);
+                  print(lngRef);
+                  LatLng position = LatLng(latRef, lngRef);
+                  mapController.moveCamera(CameraUpdate.newCameraPosition(
+                      CameraPosition(target: position, zoom: 19.00)));
+                  final Marker marker = Marker(
+                      markerId: new MarkerId(
+                          dogIdRef), //criar ID único com localização dinâmica
+                      position: position,
+                      onTap: () {
+                        _showDialog(dogNameRef, dateTimeRef);
+                      });
+                  setState(() {
+                    markers.add(marker);
                   });
-              setState(() {
-                markers.add(marker);
-              });
-            } else {
-              print("Dog nao existe");
-              _showDialog(
-                  "AVISO!", "Esse dog não existe ou não foi cadastrado!");
-              setState(() {
-                markers.clear();
-              });
-            }
-          }),
+                } else {
+                  _showDialog(
+                      "AVISO!", "Esse dog não existe ou não foi cadastrado!");
+                  setState(() {
+                    markers.clear();
+                  });
+                }
+              }),
         ),
         body: Container(
           child: GoogleMap(
@@ -111,7 +111,7 @@ class _MapPageState extends State<MapPage> {
           ),
         ),
         floatingActionButton: Padding(
-          padding: const EdgeInsets.only(right: 275.0),
+          padding: const EdgeInsets.only(right: 312.0, bottom: 20),
           child: FloatingActionButton(
             onPressed: () {
               setState(() {
