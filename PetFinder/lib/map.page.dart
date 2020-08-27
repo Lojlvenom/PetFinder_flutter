@@ -9,6 +9,28 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  void _showDialog(text1, text2) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // retorna um objeto do tipo Dialog
+        return AlertDialog(
+          title: new Text(text1),
+          content: new Text(text2),
+          actions: <Widget>[
+            // define os botões na base do dialogo
+            new FlatButton(
+              child: new Text("Fechar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   DatabaseReference dataRef;
   GoogleMapController mapController;
   Set<Marker> markers = new Set<Marker>();
@@ -19,8 +41,9 @@ class _MapPageState extends State<MapPage> {
   var lastDateRef;
   var dateTimeRef;
   var dogIdRef;
-  double lat = -3.09197916667;
-  double lng = -60.0164885;
+  final snackBar = SnackBar(content: Text('Dog nao encontrado'));
+  double lat = 46.233832398;
+  double lng = 6.053166454;
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -46,47 +69,56 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    readData();
     return Scaffold(
-      appBar: AppBar(
-        title: TextField(
-          onSubmitted: (val) {
-            readData();
-            print(latRef);
-            print(lngRef);
-            LatLng position = LatLng(latRef, lngRef);
-            mapController.moveCamera(CameraUpdate.newLatLng(position));
+        appBar: AppBar(
+          title: TextField(onSubmitted: (val) {
+            if (val == dogNameRef) {
+              print(latRef);
+              print(lngRef);
+              LatLng position = LatLng(latRef, lngRef);
+              mapController.moveCamera(CameraUpdate.newCameraPosition(
+                  CameraPosition(target: position, zoom: 19.00)));
 
-            final Marker marker = Marker(
-              markerId: new MarkerId(
-                  dogIdRef), //criar ID único com localização dinâmica
-              position: position,
-              infoWindow: InfoWindow(
-                title: dogNameRef, //Passar nome de cachorro do FIREBASE
-                snippet: dateTimeRef,
-              ),
-            );
-            setState(() {
-              markers.add(marker);
-            });
-          },
+              final Marker marker = Marker(
+                  markerId: new MarkerId(
+                      dogIdRef), //criar ID único com localização dinâmica
+                  position: position,
+                  onTap: () {
+                    _showDialog(dogNameRef, dateTimeRef);
+                  });
+              setState(() {
+                markers.add(marker);
+              });
+            } else {
+              print("Dog nao existe");
+              _showDialog(
+                  "AVISO!", "Esse dog não existe ou não foi cadastrado!");
+              setState(() {
+                markers.clear();
+              });
+            }
+          }),
         ),
-      ),
-      body: Container(
-        child: GoogleMap(
-          onMapCreated: _onMapCreated,
-          onCameraMove: (data) {
-            print(data);
-          },
-          onTap: (position) {
-            print(position);
-          },
-          initialCameraPosition: CameraPosition(
-            target: LatLng(lat, lng),
-            zoom: 18.0,
+        body: Container(
+          child: GoogleMap(
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: CameraPosition(
+              target: LatLng(lat, lng),
+              zoom: 10.0,
+            ),
+            markers: markers,
           ),
-          markers: markers,
         ),
-      ),
-    );
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(right: 275.0),
+          child: FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                markers.clear();
+              });
+            },
+          ),
+        ));
   }
 }
