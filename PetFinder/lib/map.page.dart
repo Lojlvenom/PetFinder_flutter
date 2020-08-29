@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -36,6 +37,7 @@ class _MapPageState extends State<MapPage> {
   Set<Marker> markers = new Set<Marker>();
   var latRef;
   var lngRef;
+  bool streamData;
   var dogNameRef;
   var lastTimeRef;
   var lastDateRef;
@@ -74,23 +76,30 @@ class _MapPageState extends State<MapPage> {
           title: TextField(
               decoration: new InputDecoration.collapsed(
                   hintText: 'Insira o nome do seu dog aqui!!!'),
-              onSubmitted: (val) {
+              onSubmitted: (val) async {
                 if (val == dogNameRef) {
-                  print(latRef);
-                  print(lngRef);
-                  LatLng position = LatLng(latRef, lngRef);
-                  mapController.moveCamera(CameraUpdate.newCameraPosition(
-                      CameraPosition(target: position, zoom: 19.00)));
-                  final Marker marker = Marker(
-                      markerId: new MarkerId(
-                          dogIdRef), //criar ID único com localização dinâmica
-                      position: position,
-                      onTap: () {
-                        _showDialog(dogNameRef, dateTimeRef);
-                      });
-                  setState(() {
-                    markers.add(marker);
-                  });
+                  streamData = true;
+                  while (streamData == true) {
+                    print(latRef);
+                    print(lngRef);
+                    LatLng position = LatLng(latRef, lngRef);
+                    mapController.moveCamera(CameraUpdate.newCameraPosition(
+                        CameraPosition(target: position, zoom: 19.00)));
+                    final Marker marker = Marker(
+                        markerId: new MarkerId(
+                            dogIdRef), //criar ID único com localização dinâmica
+                        position: position,
+                        onTap: () {
+                          _showDialog(dogNameRef, dateTimeRef);
+                        });
+                    setState(() {
+                      markers.add(marker);
+                    });
+                    await Future.delayed(Duration(seconds: 5));
+                    setState(() {
+                      markers.clear();
+                    });
+                  }
                 } else {
                   _showDialog(
                       "AVISO!", "Esse dog não existe ou não foi cadastrado!");
@@ -117,6 +126,8 @@ class _MapPageState extends State<MapPage> {
               setState(() {
                 markers.clear();
               });
+              streamData = false;
+              print("Stream stopped");
             },
           ),
         ));
