@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -43,8 +46,9 @@ class _MapPageState extends State<MapPage> {
   var lastDateRef;
   var dateTimeRef;
   var dogIdRef;
-  double lat = 46.233832398;
-  double lng = 6.053166454;
+  var dogModeLat;
+  var dogModeLng;
+  var initMapPos = LatLng(46.233832398, 6.053166454);
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -66,6 +70,45 @@ class _MapPageState extends State<MapPage> {
       dateTimeRef = "Data: " + lastDateRef + "\n" + "Hora: " + lastTimeRef;
       dogIdRef = snapshot.value["dog_id"].toString();
     });
+  }
+
+  void postData() {}
+
+  @override
+  Widget _getFAB() {
+    return SpeedDial(
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 22),
+      visible: true,
+      curve: Curves.bounceIn,
+      children: [
+        // FAB 1
+        SpeedDialChild(
+            child: Icon(Icons.assignment_turned_in),
+            onTap: () {/* do anything */},
+            label: 'Modo cachorro',
+            labelStyle: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 16.0),
+            labelBackgroundColor: Colors.yellow),
+        // FAB 2
+        SpeedDialChild(
+          child: Icon(Icons.assignment_turned_in),
+          onTap: () {
+            setState(() {
+              markers.clear();
+            });
+            streamData = false;
+            print("Stream stopped");
+          },
+          label: 'Parar o rastreamento',
+          labelStyle: TextStyle(
+              fontWeight: FontWeight.w500, color: Colors.white, fontSize: 16.0),
+          labelBackgroundColor: Colors.yellow,
+        )
+      ],
+    );
   }
 
   @override
@@ -113,23 +156,23 @@ class _MapPageState extends State<MapPage> {
           child: GoogleMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: CameraPosition(
-              target: LatLng(lat, lng),
+              target: initMapPos,
               zoom: 10.0,
             ),
             markers: markers,
           ),
         ),
         floatingActionButton: Padding(
-          padding: const EdgeInsets.only(right: 312.0, bottom: 20),
-          child: FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                markers.clear();
-              });
-              streamData = false;
-              print("Stream stopped");
-            },
-          ),
+          padding: const EdgeInsets.only(bottom: 100),
+          child: _getFAB(),
         ));
   }
 }
+
+// onPressed: () {
+//   setState(() {
+//     markers.clear();
+//   });
+//   streamData = false;
+//   print("Stream stopped");
+// },
