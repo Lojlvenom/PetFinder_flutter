@@ -121,7 +121,7 @@ class _MapPageState extends State<MapPage> {
         return AlertDialog(
           title: new Text('Modo cachorro ativado'),
           content: new Text(
-              'Agora você está no modo cachorro, utilize outro celular para consultar a localização'),
+              'Agora você está no modo cachorro, utilize outro celular para consultar a localização.'),
           actions: <Widget>[
             // define os botões na base do dialogo
             new FlatButton(
