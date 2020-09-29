@@ -99,8 +99,8 @@ class _MapPageState extends State<MapPage> {
           actions: <Widget>[
             // define os botões na base do dialogo
             new FlatButton(
-              color: Colors.yellow,
-              textColor: Colors.black,
+              color: Colors.blue,
+              textColor: Colors.white,
               child: new Text("Fechar"),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -127,7 +127,7 @@ class _MapPageState extends State<MapPage> {
             new FlatButton(
               color: Colors.red,
               textColor: Colors.white,
-              child: new Text("SAIR"),
+              child: new Text("SAIR DO MODO CACHORRO"),
               onPressed: () {
                 streamDataDog = false;
                 print(" DOG Stream stopped");
@@ -149,25 +149,24 @@ class _MapPageState extends State<MapPage> {
       children: [
         // FAB 1
         SpeedDialChild(
-            child: Icon(Icons.pets),
-            onTap: () async {
-              streamData = false;
-              print("LOCATOR Stream stopped");
-              print("DOG Stream start");
-              streamDataDog = true;
-              _showDialogDog();
-              while (streamDataDog == true) {
-                getDogGpsPosition();
-                postData();
-                await Future.delayed(Duration(seconds: 1));
-              }
-            },
-            label: 'Modo cachorro',
-            labelStyle: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-                fontSize: 16.0),
-            labelBackgroundColor: Colors.yellow),
+          child: Icon(Icons.pets),
+          onTap: () async {
+            streamData = false;
+            print("LOCATOR Stream stopped");
+            print("DOG Stream start");
+            streamDataDog = true;
+            _showDialogDog();
+            while (streamDataDog == true) {
+              getDogGpsPosition();
+              postData();
+              await Future.delayed(Duration(seconds: 1));
+            }
+          },
+          label: 'Modo cachorro',
+          labelStyle: TextStyle(
+              fontWeight: FontWeight.w500, color: Colors.white, fontSize: 16.0),
+          labelBackgroundColor: Colors.blue,
+        ),
         // FAB 2
         SpeedDialChild(
           backgroundColor: Colors.red,
@@ -183,7 +182,7 @@ class _MapPageState extends State<MapPage> {
           },
           label: 'Parar o rastreamento',
           labelStyle: TextStyle(
-              fontWeight: FontWeight.w500, color: Colors.black, fontSize: 16.0),
+              fontWeight: FontWeight.w500, color: Colors.white, fontSize: 16.0),
           labelBackgroundColor: Colors.red,
         )
       ],

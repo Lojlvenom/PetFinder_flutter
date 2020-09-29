@@ -24,7 +24,9 @@ dependencies:
   flutter:
     sdk: flutter
   google_maps_flutter: ^0.5.30
-  firebase_database: ^3.1.6
+  firebase_database: ^4.0.0
+  firebase_core: ^0.5.0  
+  firebase_web: ^5.0.9
   firebase_core_web: ^0.2.0
   flutter_speed_dial: ^1.2.5
   geolocator: ^6.0.0+4
