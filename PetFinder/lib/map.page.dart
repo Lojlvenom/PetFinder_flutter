@@ -99,8 +99,8 @@ class _MapPageState extends State<MapPage> {
           actions: <Widget>[
             // define os botões na base do dialogo
             new FlatButton(
-              color: Colors.blue,
-              textColor: Colors.white,
+              color: Colors.yellow,
+              textColor: Colors.black,
               child: new Text("Fechar"),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -119,7 +119,7 @@ class _MapPageState extends State<MapPage> {
       builder: (BuildContext context) {
         // retorna um objeto do tipo Dialog
         return AlertDialog(
-          title: new Text('Modo cachorro ativado'),
+          title: new Text('Modo cachorro ativado!'),
           content: new Text(
               'Agora você está no modo cachorro, utilize outro celular para consultar a localização.'),
           actions: <Widget>[
@@ -164,20 +164,23 @@ class _MapPageState extends State<MapPage> {
           },
           label: 'Modo cachorro',
           labelStyle: TextStyle(
-              fontWeight: FontWeight.w500, color: Colors.white, fontSize: 16.0),
-          labelBackgroundColor: Colors.blue,
+              fontWeight: FontWeight.w500, color: Colors.black, fontSize: 16.0),
+          labelBackgroundColor: Colors.yellow,
         ),
         // FAB 2
         SpeedDialChild(
           backgroundColor: Colors.red,
-          child: Icon(Icons.warning),
+          child: Icon(
+            Icons.warning,
+            color: Colors.white,
+          ),
           onTap: () {
             setState(() {
               markers.clear();
             });
             streamData = false;
             print("LOCATOR Stream stopped");
-            _showDialog("Rastreamento Interrompido",
+            _showDialog("Rastreamento Interrompido!",
                 "O rastreamento foi interrompido no momento, para realizar uma nova consulta digite o nome do seu animal na caixa de texto.");
           },
           label: 'Parar o rastreamento',
