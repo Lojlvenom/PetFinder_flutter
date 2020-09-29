@@ -1,11 +1,11 @@
 import 'dart:async';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:geolocator/geolocator.dart';
 
 class MapPage extends StatefulWidget {
   @override
@@ -13,6 +13,22 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  DatabaseReference dataRef;
+  GoogleMapController mapController;
+  Set<Marker> markers = new Set<Marker>();
+  var latRef;
+  var lngRef;
+  bool streamData;
+  bool streamDataDog;
+  var dogNameRef;
+  var lastTimeRef;
+  var lastDateRef;
+  var dateTimeRef;
+  var dogIdRef;
+  var dogModeLat;
+  var dogModeLng;
+  var initMapPos = LatLng(46.233832398, 6.053166454);
+
   void _showDialog(text1, text2) {
     showDialog(
       context: context,
@@ -35,20 +51,30 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  DatabaseReference dataRef;
-  GoogleMapController mapController;
-  Set<Marker> markers = new Set<Marker>();
-  var latRef;
-  var lngRef;
-  bool streamData;
-  var dogNameRef;
-  var lastTimeRef;
-  var lastDateRef;
-  var dateTimeRef;
-  var dogIdRef;
-  var dogModeLat;
-  var dogModeLng;
-  var initMapPos = LatLng(46.233832398, 6.053166454);
+  void _showDialogDog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // retorna um objeto do tipo Dialog
+        return AlertDialog(
+          title: new Text('Modo cachorro ativado'),
+          content: new Text(
+              'Agora voce esta no modo cachorro, utilize outro celular para consultar a localizacao'),
+          actions: <Widget>[
+            // define os botões na base do dialogo
+            new FlatButton(
+              child: new Text("Sair do modo cachorro!"),
+              onPressed: () {
+                streamDataDog = false;
+                print(" DOG Stream stopped");
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -72,9 +98,33 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  void postData() {}
+  void postData() async {
+    DateTime now = new DateTime.now();
+    var hourStr = now.hour.toString();
+    var minuteStr = now.minute.toString();
+    var secStr = now.second.toString();
+    var timePayload = hourStr + ":" + minuteStr + ":" + secStr;
 
-  @override
+    var dayStr = now.day.toString();
+    var monStr = now.month.toString();
+    var yrStr = now.year.toString();
+    var datePayload = dayStr + ":" + monStr + ":" + yrStr;
+
+    final position =
+        await getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    dogModeLat = position.latitude;
+    dogModeLng = position.longitude;
+
+    dataRef.set({
+      'latitude': dogModeLat,
+      'longitude': dogModeLng,
+      'dog_name': "Shurastei",
+      'time': timePayload,
+      'date': datePayload,
+      'dog_id': '1'
+    });
+  }
+
   Widget _getFAB() {
     return SpeedDial(
       animatedIcon: AnimatedIcons.menu_close,
@@ -85,7 +135,14 @@ class _MapPageState extends State<MapPage> {
         // FAB 1
         SpeedDialChild(
             child: Icon(Icons.assignment_turned_in),
-            onTap: () {/* do anything */},
+            onTap: () async {
+              streamDataDog = true;
+              _showDialogDog();
+              while (streamDataDog == true) {
+                postData();
+                await Future.delayed(Duration(seconds: 2));
+              }
+            },
             label: 'Modo cachorro',
             labelStyle: TextStyle(
                 fontWeight: FontWeight.w500,
@@ -138,7 +195,7 @@ class _MapPageState extends State<MapPage> {
                     setState(() {
                       markers.add(marker);
                     });
-                    await Future.delayed(Duration(seconds: 5));
+                    await Future.delayed(Duration(seconds: 2));
                     setState(() {
                       markers.clear();
                     });
