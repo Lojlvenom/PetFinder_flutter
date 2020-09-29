@@ -12,6 +12,7 @@ class MapPage extends StatefulWidget {
   _MapPageState createState() => _MapPageState();
 }
 
+// init
 class _MapPageState extends State<MapPage> {
   DatabaseReference dataRef;
   GoogleMapController mapController;
@@ -28,6 +29,64 @@ class _MapPageState extends State<MapPage> {
   var dogModeLat;
   var dogModeLng;
   var initMapPos = LatLng(46.233832398, 6.053166454);
+
+// DB AND MAP CONTROLLER
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+
+  @override
+  void initState() {
+    dataRef = FirebaseDatabase.instance.reference().child("ShurasteiHash");
+    super.initState();
+  }
+
+// READ DATA - TRACK MODE
+
+  void readData() {
+    dataRef.once().then((DataSnapshot snapshot) {
+      latRef = snapshot.value["latitude"];
+      lngRef = snapshot.value["longitude"];
+      dogNameRef = snapshot.value["dog_name"];
+      lastTimeRef = snapshot.value["time"].toString();
+      lastDateRef = snapshot.value["date"].toString();
+      dateTimeRef = "Data: " + lastDateRef + "\n" + "Hora: " + lastTimeRef;
+      dogIdRef = snapshot.value["dog_id"].toString();
+    });
+  }
+
+// POST DATA - DOG MODE
+  void getDogGpsPosition() async {
+    final position =
+        await getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    dogModeLat = position.latitude;
+    dogModeLng = position.longitude;
+  }
+
+  void postData() {
+    DateTime now = new DateTime.now();
+    var hourStr = now.hour.toString();
+    var minuteStr = now.minute.toString();
+    var secStr = now.second.toString();
+    var timePayload = hourStr + ":" + minuteStr + ":" + secStr;
+
+    var dayStr = now.day.toString();
+    var monStr = now.month.toString();
+    var yrStr = now.year.toString();
+    var datePayload = dayStr + " / " + monStr + " / " + yrStr;
+
+    dataRef.set({
+      'latitude': dogModeLat,
+      'longitude': dogModeLng,
+      'dog_name': "Shurastei",
+      'time': timePayload,
+      'date': datePayload,
+      'dog_id': '1'
+    });
+  }
+
+// DIALOGS AND FAB WIDGET
 
   void _showDialog(text1, text2) {
     showDialog(
@@ -81,57 +140,6 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
-  @override
-  void initState() {
-    dataRef = FirebaseDatabase.instance.reference().child("ShurasteiHash");
-    super.initState();
-  }
-
-  void readData() {
-    dataRef.once().then((DataSnapshot snapshot) {
-      latRef = snapshot.value["latitude"];
-      lngRef = snapshot.value["longitude"];
-      dogNameRef = snapshot.value["dog_name"];
-      lastTimeRef = snapshot.value["time"].toString();
-      lastDateRef = snapshot.value["date"].toString();
-      dateTimeRef = "Data: " + lastDateRef + "\n" + "Hora: " + lastTimeRef;
-      dogIdRef = snapshot.value["dog_id"].toString();
-    });
-  }
-
-  void getDogGpsPosition() async {
-    final position =
-        await getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    dogModeLat = position.latitude;
-    dogModeLng = position.longitude;
-  }
-
-  void postData() {
-    DateTime now = new DateTime.now();
-    var hourStr = now.hour.toString();
-    var minuteStr = now.minute.toString();
-    var secStr = now.second.toString();
-    var timePayload = hourStr + ":" + minuteStr + ":" + secStr;
-
-    var dayStr = now.day.toString();
-    var monStr = now.month.toString();
-    var yrStr = now.year.toString();
-    var datePayload = dayStr + ":" + monStr + ":" + yrStr;
-
-    dataRef.set({
-      'latitude': dogModeLat,
-      'longitude': dogModeLng,
-      'dog_name': "Shurastei",
-      'time': timePayload,
-      'date': datePayload,
-      'dog_id': '1'
-    });
-  }
-
   Widget _getFAB() {
     return SpeedDial(
       animatedIcon: AnimatedIcons.menu_close,
@@ -143,6 +151,7 @@ class _MapPageState extends State<MapPage> {
         SpeedDialChild(
             child: Icon(Icons.pets),
             onTap: () async {
+              streamData = false;
               streamDataDog = true;
               _showDialogDog();
               while (streamDataDog == true) {
@@ -178,6 +187,8 @@ class _MapPageState extends State<MapPage> {
       ],
     );
   }
+
+  // MAIN SCAFFOLD
 
   @override
   Widget build(BuildContext context) {
