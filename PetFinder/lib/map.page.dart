@@ -74,7 +74,7 @@ class _MapPageState extends State<MapPage> {
     var dayStr = now.day.toString();
     var monStr = now.month.toString();
     var yrStr = now.year.toString();
-    var datePayload = dayStr + " / " + monStr + " / " + yrStr;
+    var datePayload = dayStr + "/" + monStr + "/" + yrStr;
 
     dataRef.set({
       'latitude': dogModeLat,
@@ -121,7 +121,7 @@ class _MapPageState extends State<MapPage> {
         return AlertDialog(
           title: new Text('Modo cachorro ativado'),
           content: new Text(
-              'Agora voce esta no modo cachorro, utilize outro celular para consultar a localizacao'),
+              'Agora você está no modo cachorro, utilize outro celular para consultar a localização'),
           actions: <Widget>[
             // define os botões na base do dialogo
             new FlatButton(
@@ -152,12 +152,14 @@ class _MapPageState extends State<MapPage> {
             child: Icon(Icons.pets),
             onTap: () async {
               streamData = false;
+              print("LOCATOR Stream stopped");
+              print("DOG Stream start");
               streamDataDog = true;
               _showDialogDog();
               while (streamDataDog == true) {
                 getDogGpsPosition();
                 postData();
-                await Future.delayed(Duration(seconds: 2));
+                await Future.delayed(Duration(seconds: 1));
               }
             },
             label: 'Modo cachorro',
@@ -175,7 +177,7 @@ class _MapPageState extends State<MapPage> {
               markers.clear();
             });
             streamData = false;
-            print("Stream stopped");
+            print("LOCATOR Stream stopped");
             _showDialog("Rastreamento Interrompido",
                 "O rastreamento foi interrompido no momento, para realizar uma nova consulta digite o nome do seu animal na caixa de texto.");
           },
@@ -202,6 +204,7 @@ class _MapPageState extends State<MapPage> {
                 if (val == dogNameRef) {
                   streamData = true;
                   while (streamData == true) {
+                    print("LOCATOR Stream start");
                     print(latRef);
                     print(lngRef);
                     LatLng position = LatLng(latRef, lngRef);
@@ -217,7 +220,7 @@ class _MapPageState extends State<MapPage> {
                     setState(() {
                       markers.add(marker);
                     });
-                    await Future.delayed(Duration(seconds: 2));
+                    await Future.delayed(Duration(seconds: 1));
                     setState(() {
                       markers.clear();
                     });
