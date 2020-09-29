@@ -40,6 +40,8 @@ class _MapPageState extends State<MapPage> {
           actions: <Widget>[
             // define os botões na base do dialogo
             new FlatButton(
+              color: Colors.yellow,
+              textColor: Colors.black,
               child: new Text("Fechar"),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -54,6 +56,7 @@ class _MapPageState extends State<MapPage> {
   void _showDialogDog() {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         // retorna um objeto do tipo Dialog
         return AlertDialog(
@@ -63,7 +66,9 @@ class _MapPageState extends State<MapPage> {
           actions: <Widget>[
             // define os botões na base do dialogo
             new FlatButton(
-              child: new Text("Sair do modo cachorro!"),
+              color: Colors.red,
+              textColor: Colors.white,
+              child: new Text("SAIR"),
               onPressed: () {
                 streamDataDog = false;
                 print(" DOG Stream stopped");
@@ -98,7 +103,14 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  void postData() async {
+  void getDogGpsPosition() async {
+    final position =
+        await getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    dogModeLat = position.latitude;
+    dogModeLng = position.longitude;
+  }
+
+  void postData() {
     DateTime now = new DateTime.now();
     var hourStr = now.hour.toString();
     var minuteStr = now.minute.toString();
@@ -109,11 +121,6 @@ class _MapPageState extends State<MapPage> {
     var monStr = now.month.toString();
     var yrStr = now.year.toString();
     var datePayload = dayStr + ":" + monStr + ":" + yrStr;
-
-    final position =
-        await getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    dogModeLat = position.latitude;
-    dogModeLng = position.longitude;
 
     dataRef.set({
       'latitude': dogModeLat,
@@ -134,11 +141,12 @@ class _MapPageState extends State<MapPage> {
       children: [
         // FAB 1
         SpeedDialChild(
-            child: Icon(Icons.assignment_turned_in),
+            child: Icon(Icons.pets),
             onTap: () async {
               streamDataDog = true;
               _showDialogDog();
               while (streamDataDog == true) {
+                getDogGpsPosition();
                 postData();
                 await Future.delayed(Duration(seconds: 2));
               }
@@ -146,23 +154,26 @@ class _MapPageState extends State<MapPage> {
             label: 'Modo cachorro',
             labelStyle: TextStyle(
                 fontWeight: FontWeight.w500,
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 16.0),
             labelBackgroundColor: Colors.yellow),
         // FAB 2
         SpeedDialChild(
-          child: Icon(Icons.assignment_turned_in),
+          backgroundColor: Colors.red,
+          child: Icon(Icons.warning),
           onTap: () {
             setState(() {
               markers.clear();
             });
             streamData = false;
             print("Stream stopped");
+            _showDialog("Rastreamento Interrompido",
+                "O rastreamento foi interrompido no momento, para realizar uma nova consulta digite o nome do seu animal na caixa de texto.");
           },
           label: 'Parar o rastreamento',
           labelStyle: TextStyle(
-              fontWeight: FontWeight.w500, color: Colors.white, fontSize: 16.0),
-          labelBackgroundColor: Colors.yellow,
+              fontWeight: FontWeight.w500, color: Colors.black, fontSize: 16.0),
+          labelBackgroundColor: Colors.red,
         )
       ],
     );
@@ -225,11 +236,3 @@ class _MapPageState extends State<MapPage> {
         ));
   }
 }
-
-// onPressed: () {
-//   setState(() {
-//     markers.clear();
-//   });
-//   streamData = false;
-//   print("Stream stopped");
-// },
