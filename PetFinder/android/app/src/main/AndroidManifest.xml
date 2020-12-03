@@ -15,7 +15,7 @@
        
         <meta-data
               android:name="com.google.android.geo.API_KEY"
-              android:value="AIzaSyAxuciBbNd-jYX8XaoiNaI4RWpOa2Xo9Ns"
+              android:value="inserir sua chave da api do google"
               />
        
         <activity
